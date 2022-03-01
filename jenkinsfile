@@ -1,0 +1,43 @@
+node 
+{
+    // some block
+	try {
+	 stage('Git ChechOut') {
+	  git branch: 'main', url: 'https://github.com/haricharan963/JavaCode.git' 
+	 }
+	 
+	 stage('Maven Clean') {
+	  sh 'mvn clean'
+	 }
+
+	 stage('Maven Compile') {
+	  sh 'mvn compile'
+	 }
+	 
+	 stage('Maven Test') {
+		sh 'mvn test'
+	 }
+
+	 stage('Maven Package') {
+	  sh 'mvn package'
+	 }
+	  stage('Sending mail') {
+		notify('Success')
+	 }
+	 
+	}
+	catch(err) {
+		notify("Error ${err}")
+		currentBuild.result = 'FAILURE'
+	}
+	
+}
+
+def notify(status){
+    emailext (
+      to: "allamharicharan1999@gmail.com",
+      subject: "${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+      body: """<p>${status}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+        <p>Check console output at <a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a></p>""",
+    )
+}
